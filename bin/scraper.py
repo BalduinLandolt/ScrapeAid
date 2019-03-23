@@ -60,20 +60,23 @@ class Scraper:
 
         soup_level1 = BeautifulSoup(driver.page_source, 'html')
         print("\n\nGot HTML:\n\n")
-        print(soup_level1)
+        #print(soup_level1)
 
         print("\n\n")
 
         links = []
 
         for a in soup_level1.find_all('a'):
-            print(a)
-            if str(a).startswith("<a class=\"nlink"):
+            #print(a)
+            if str(a).startswith("<a class=\"nlink\" data-book=\"#eKGWB/"):
                 links.append(a)
 
         print("\n\nlinks:")
         for s in links:
             print(s)
+
+        buttons = []
+        #driver.find_element_by_link_text()
 
         driver.close()
 
