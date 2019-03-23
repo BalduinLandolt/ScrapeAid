@@ -2,6 +2,11 @@ import requests
 import urllib.request
 import time
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import re
+import pandas as pd
+import os
 
 
 class Scraper:
@@ -17,17 +22,6 @@ class Scraper:
         print("Initialized an instance of Scraper")
         return
 
-    def call_url(self, url):
-        """
-
-        :param url:
-        :return:
-        """
-
-        print("calling: {}".format(url))
-
-        return 0
-
     def run(self):
         """
         Run Scraper.
@@ -42,7 +36,32 @@ class Scraper:
 # TODO do stuff here
 
 # TODO Test URL. Should be solved by dynamic input
-        url = "http://www.nietzschesource.org/"
+        url = "http://www.nietzschesource.org/#eKGWB/"
         self.call_url(url)
 
         return exit_code
+
+    def call_url(self, url):
+        """
+
+        :param url:
+        :return:
+        """
+
+        print("calling: {}".format(url))
+        print("Opening browser...")
+
+        driver = webdriver.Firefox()
+        driver.implicitly_wait(30)
+
+        print("Browser open.\nDoing stuff now...")
+
+        driver.get(url)
+
+        soup_level1 = BeautifulSoup(driver.page_source, 'html')
+        print("\n\nGot HTML:\n\n")
+        print(soup_level1)
+
+        #driver.close()
+
+        return 0
