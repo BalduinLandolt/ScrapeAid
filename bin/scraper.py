@@ -72,12 +72,48 @@ class Scraper:
                 links.append(a)
 
         print("\n\nlinks:")
+        link_texts = []
+        link_paths = []
         for s in links:
             print(s)
+            link_texts.append(self.__get_link_text(s))
+            link_paths.append(self.__get_link_adress(s, url))
+
+        print("\n\nGot links to look for:\n")
 
         buttons = []
-        #driver.find_element_by_link_text()
+        for t in link_paths:
+            print(t)
+
+        print("\n\nButtons to check: {}".format(len(buttons)))
 
         driver.close()
 
         return 0
+
+    def __get_link_text(self, tag):
+        res = ""
+
+        parts = str(tag).split('>')
+
+        if len(parts) > 1:
+            res = parts[1]
+
+        parts = res.split('<')
+        res = parts[0]
+
+        return res
+
+    def __get_link_adress(self, tag, url):
+        res = ""
+        url_prefix = str(url).split('#')[0]
+
+        parts = str(tag).split('data-link=\"')
+
+        if len(parts) > 1:
+            res = parts[1]
+
+        parts = res.split('\"')
+        res = url_prefix + parts[0]
+
+        return res
