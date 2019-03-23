@@ -91,6 +91,7 @@ class Scraper:
         for l in link_paths:
             i = link_paths.index(l)
             title = link_texts[i]
+            # TODO remove max clause to get all
             if i >= max:
                 break
             print("Looking for '{}' in: {}".format(title, l))
