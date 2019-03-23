@@ -62,6 +62,19 @@ class Scraper:
         print("\n\nGot HTML:\n\n")
         print(soup_level1)
 
-        #driver.close()
+        print("\n\n")
+
+        links = []
+
+        for a in soup_level1.find_all('a'):
+            print(a)
+            if str(a).startswith("<a class=\"nlink"):
+                links.append(a)
+
+        print("\n\nlinks:")
+        for s in links:
+            print(s)
+
+        driver.close()
 
         return 0
