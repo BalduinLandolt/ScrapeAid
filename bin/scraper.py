@@ -53,20 +53,21 @@ class Scraper:
 
         driver = webdriver.Firefox()
         driver.implicitly_wait(30)
+        driver.set_window_rect(600, 10, 1000, 800)
 
         print("Browser open.\nDoing stuff now...")
 
         driver.get(url)
 
-        soup_level1 = BeautifulSoup(driver.page_source, 'html')
+        soup = BeautifulSoup(driver.page_source, 'lxml')
         print("\n\nGot HTML:\n\n")
-        #print(soup_level1)
+        #print(soup)
 
-        print("\n\n")
+        #print("\n\n")
 
         links = []
 
-        for a in soup_level1.find_all('a'):
+        for a in soup.find_all('a'):
             #print(a)
             if str(a).startswith("<a class=\"nlink\" data-book=\"#eKGWB/"):
                 links.append(a)
@@ -81,15 +82,42 @@ class Scraper:
 
         print("\n\nGot links to look for:\n")
 
-        buttons = []
         for t in link_paths:
             print(t)
 
-        print("\n\nButtons to check: {}".format(len(buttons)))
+        time.sleep(1)
+        max = 1
+
+        for l in link_paths:
+            i = link_paths.index(l)
+            title = link_texts[i]
+            if i >= max:
+                break
+            print("Looking for '{}' in: {}".format(title, l))
+            res = self.grab_text(driver, l)
+            # TODO Store result
+            print("Waiting 1 second...")
+            time.sleep(1)
 
         driver.close()
 
         return 0
+
+    def grab_text(self, driver, url):
+        res = ""
+
+        print("Should be grabbin' stuff here\n\n")
+        driver.get(url)
+        driver.refresh()
+
+        soup = BeautifulSoup(driver.page_source, 'lxml')
+        for div in soup.find_all('div'):
+            if str(div).startswith("<div class=\"txt"):
+                print(div)
+
+        # TODO store result from driver
+
+        return res
 
     def __get_link_text(self, tag):
         res = ""
