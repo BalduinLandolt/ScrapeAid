@@ -112,8 +112,15 @@ class Scraper:
 
         soup = BeautifulSoup(driver.page_source, 'lxml')
         for div in soup.find_all('div'):
-            if str(div).startswith("<div class=\"txt"):
-                print(div)
+            if 'class' in div.attrs:
+                if len(div.attrs['class']) > 0 and div.attrs['class'][0] == "txt_block":
+                    sub_soup = BeautifulSoup(str(div))
+                    # TODO read h2 etc. here
+                    for sub_div in sub_soup.find_all('div'):
+                        if len(sub_div.attrs['class']) > 0 and sub_div.attrs['class'][0] == "p":
+                            print(sub_div.attrs)
+                            print(sub_div)
+                            print("\n\n------------\n\n")
 
         # TODO store result from driver
 
