@@ -11,6 +11,8 @@ from text import ScrapedText
 
 # TODO check dithyramben
 
+# TODO FF in jenseits von gut und böse (und anderen späteren?), sonst nicht... einheitlich!
+
 class Scraper:
     """
     Class 'Scraper' that does all the scraping.
@@ -96,7 +98,7 @@ class Scraper:
             #    break
 
             #for testing purpose
-            if title != "Jenseits von Gut und Böse":
+            if title != "Also sprach Zarathustra III":
                 continue
 
             print("Looking for '{}' in: {}".format(title, l))
@@ -148,7 +150,7 @@ class Scraper:
                             wrapper['class'] = 'p'
                             p.wrap(wrapper)
                     for sub_div in sub_soup.find_all('div'):
-                        if len(sub_div.attrs['class']) > 0 and sub_div.attrs['class'][0] == "p":
+                        if len(sub_div.attrs['class']) > 0 and (sub_div.attrs['class'][0] == "p" or sub_div.attrs['class'][0] == "l"):
                             res_list.append(sub_div)
 
         print("scraped {}".format(url))
