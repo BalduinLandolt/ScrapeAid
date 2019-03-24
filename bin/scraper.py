@@ -105,7 +105,7 @@ class Scraper:
         print("got {} texts:".format(len(texts)))
         for t in texts:
             print(t.get_title())
-            self.__save_to_file(t)
+            self.__save_to_file(t) # TODO should be done while loading, not in the end
             print("##################")
 
         # TODO check for exit code
