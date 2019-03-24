@@ -89,9 +89,15 @@ class Scraper:
         for l in link_paths:
             i = link_paths.index(l)
             title = link_texts[i]
-            # TODO remove max clause to get all
+
+            # for testing purposes
             #if i >= max:
             #    break
+
+            #for testing purpose
+            #if title != "Götzen-Dämmerung":
+            #    continue
+
             print("Looking for '{}' in: {}".format(title, l))
             res = self.grab_text(driver, l)
             txt = ScrapedText(title, res)
@@ -135,6 +141,11 @@ class Scraper:
                         res_list.append(h)
                     for h in sub_soup.find_all('h6'):
                         res_list.append(h)
+                    for p in sub_soup.find_all('p'):
+                        if p.has_attr('class') and len(p.attrs['class']) > 0 and p.attrs['class'][0] == "Untertitel":
+                            wrapper = sub_soup.new_tag("div")
+                            wrapper['class'] = 'p'
+                            p.wrap(wrapper)
                     for sub_div in sub_soup.find_all('div'):
                         if len(sub_div.attrs['class']) > 0 and sub_div.attrs['class'][0] == "p":
                             res_list.append(sub_div)
