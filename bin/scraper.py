@@ -97,6 +97,7 @@ class Scraper:
             txt = ScrapedText(title, res)
             res_all.append(res)
             texts.append(txt)
+            self.__save_to_file(txt)
             print("\nWaiting 1 second...\n")
             time.sleep(1)
 
@@ -105,7 +106,6 @@ class Scraper:
         print("got {} texts:".format(len(texts)))
         for t in texts:
             print(t.get_title())
-            self.__save_to_file(t) # TODO should be done while loading, not in the end
             print("##################")
 
         # TODO check for exit code
@@ -181,8 +181,9 @@ class Scraper:
         with open(path, "w+", encoding='utf-8') as f:
             f.write("$" + text.get_title())
             f.write("\n")
-            c = text.get_content()
-            for l in c:
-                f.write(str(l) + "\n")
+            #c = text.get_content()
+            #for l in c:
+            #    f.write(str(l) + "\n")
+            f.write(text.get_content_string())
 
         return
