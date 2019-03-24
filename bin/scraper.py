@@ -7,6 +7,7 @@ from selenium.webdriver.common.keys import Keys
 import re
 import pandas as pd
 import os
+from text import ScrapedText
 
 
 class Scraper:
@@ -80,9 +81,10 @@ class Scraper:
             print(t)
 
         time.sleep(1)
-        max = 3
+        max = 1
 
         res_all = []
+        texts = []
 
         for l in link_paths:
             i = link_paths.index(l)
@@ -92,13 +94,19 @@ class Scraper:
                 break
             print("Looking for '{}' in: {}".format(title, l))
             res = self.grab_text(driver, l)
+            txt = ScrapedText(title, res)
             res_all.append(res)
+            texts.append(txt)
             print("\nWaiting 1 second...\n")
             time.sleep(1)
 
         driver.close()
 
-        print("got {} texts".format(len(res_all)))
+        print("got {} texts:".format(len(texts)))
+        for t in texts:
+            print(t.get_title())
+            self.__save_to_file(t)
+            print("##################")
 
         # TODO check for exit code
         return 0
@@ -162,3 +170,19 @@ class Scraper:
         res = url_prefix + parts[0]
 
         return res
+
+    def __save_to_file(self, text):
+        path = "data/output/" + text.get_title() + ".txt"
+
+        #if not os.path.isfile(path):
+        #    with open(path, "x") as f:
+        #        print("Created File: {}".format(f))
+
+        with open(path, "w+", encoding='utf-8') as f:
+            f.write("$" + text.get_title())
+            f.write("\n")
+            c = text.get_content()
+            for l in c:
+                f.write(str(l) + "\n")
+
+        return
