@@ -90,8 +90,8 @@ class Scraper:
             i = link_paths.index(l)
             title = link_texts[i]
             # TODO remove max clause to get all
-            if i >= max:
-                break
+            #if i >= max:
+            #    break
             print("Looking for '{}' in: {}".format(title, l))
             res = self.grab_text(driver, l)
             txt = ScrapedText(title, res)
