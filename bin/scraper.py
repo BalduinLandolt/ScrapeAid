@@ -31,10 +31,7 @@ class Scraper:
 
         print("Running Scraper...\n")
 
-        exit_code = 0
-
-        # TODO ckeck for exit code
-        self.call_url(url)
+        exit_code = self.call_url(url)
 
         return exit_code
 
@@ -83,7 +80,9 @@ class Scraper:
             print(t)
 
         time.sleep(1)
-        max = 1
+        max = 3
+
+        res_all = []
 
         for l in link_paths:
             i = link_paths.index(l)
@@ -93,36 +92,49 @@ class Scraper:
                 break
             print("Looking for '{}' in: {}".format(title, l))
             res = self.grab_text(driver, l)
-            # TODO Store result
-            print("Waiting 1 second...")
+            res_all.append(res)
+            print("\nWaiting 1 second...\n")
             time.sleep(1)
 
         driver.close()
 
+        print("got {} texts".format(len(res_all)))
+
+        # TODO check for exit code
         return 0
 
     def grab_text(self, driver, url):
-        res = ""
-
-        print("Should be grabbin' stuff here\n\n")
+        print("grabbing...")
         driver.get(url)
         driver.refresh()
+
+        res_list = []
 
         soup = BeautifulSoup(driver.page_source, 'lxml')
         for div in soup.find_all('div'):
             if 'class' in div.attrs:
                 if len(div.attrs['class']) > 0 and div.attrs['class'][0] == "txt_block":
-                    sub_soup = BeautifulSoup(str(div))
-                    # TODO read h2 etc. here
+                    sub_soup = BeautifulSoup(str(div), 'lxml')
+                    for h in sub_soup.find_all('h1'):
+                        res_list.append(h)
+                    for h in sub_soup.find_all('h2'):
+                        res_list.append(h)
+                    for h in sub_soup.find_all('h3'):
+                        res_list.append(h)
+                    for h in sub_soup.find_all('h4'):
+                        res_list.append(h)
+                    for h in sub_soup.find_all('h5'):
+                        res_list.append(h)
+                    for h in sub_soup.find_all('h6'):
+                        res_list.append(h)
                     for sub_div in sub_soup.find_all('div'):
                         if len(sub_div.attrs['class']) > 0 and sub_div.attrs['class'][0] == "p":
-                            print(sub_div.attrs)
-                            print(sub_div)
-                            print("\n\n------------\n\n")
+                            res_list.append(sub_div)
 
-        # TODO store result from driver
+        print("scraped {}".format(url))
+        print("got {} elements that might be containing text".format(len(res_list)))
 
-        return res
+        return res_list
 
     def __get_link_text(self, tag):
         res = ""
