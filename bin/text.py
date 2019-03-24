@@ -24,17 +24,17 @@ class ScrapedText:
             for br in soup.find_all('br'):
                 br.replace_with("\n")
             for h in soup.find_all('h1'):
-                h.insert_before("\n")
+                h.insert_before("\n\f")
             for h in soup.find_all('h2'):
-                h.insert_before("\n")
+                h.insert_before("\n\f")
             for h in soup.find_all('h3'):
-                h.insert_before("\n")
+                h.insert_before("\n\f")
             for h in soup.find_all('h4'):
-                h.insert_before("\n")
+                h.insert_before("\n\f")
             for h in soup.find_all('h5'):
-                h.insert_before("\n")
+                h.insert_before("\n\f")
             for h in soup.find_all('h6'):
-                h.insert_before("\n")
+                h.insert_before("\n\f")
             while "Erratum" in soup.get_text():
                 #print(soup)
                 soup.find('em').parent.decompose()

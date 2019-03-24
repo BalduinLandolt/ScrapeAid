@@ -9,6 +9,7 @@ import pandas as pd
 import os
 from text import ScrapedText
 
+# TODO check dithyramben
 
 class Scraper:
     """
@@ -95,8 +96,8 @@ class Scraper:
             #    break
 
             #for testing purpose
-            #if title != "Götzen-Dämmerung":
-            #    continue
+            if title != "Jenseits von Gut und Böse":
+                continue
 
             print("Looking for '{}' in: {}".format(title, l))
             res = self.grab_text(driver, l)
