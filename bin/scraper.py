@@ -22,7 +22,7 @@ class Scraper:
         print("Initialized an instance of Scraper")
         return
 
-    def run(self):
+    def run(self, url):
         """
         Run Scraper.
 
@@ -33,10 +33,7 @@ class Scraper:
 
         exit_code = 0
 
-# TODO do stuff here
-
-# TODO Test URL. Should be solved by dynamic input
-        url = "http://www.nietzschesource.org/#eKGWB/"
+        # TODO ckeck for exit code
         self.call_url(url)
 
         return exit_code
