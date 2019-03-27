@@ -1,13 +1,7 @@
-import requests
-import urllib.request
 import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-import re
-import pandas as pd
 import os
-from text import ScrapedText
 import sys
 
 # TODO check dithyramben
@@ -68,7 +62,6 @@ class Scraper:
             self.__cache_text_block(title, html_string)
         return
 
-
     def download_from_url(self, url):
         """
         Run Scraper.
@@ -81,7 +74,6 @@ class Scraper:
         self.call_url(url)
 
         return
-
 
     def call_url(self, url):
         """
@@ -102,14 +94,10 @@ class Scraper:
 
         soup = BeautifulSoup(driver.page_source, 'lxml')
         print("\n\nGot HTML:\n\n")
-        #print(soup)
-
-        #print("\n\n")
 
         links = []
 
         for a in soup.find_all('a'):
-            #print(a)
             if str(a).startswith("<a class=\"nlink\" data-book=\"#eKGWB/"):
                 links.append(a)
 
@@ -131,9 +119,6 @@ class Scraper:
         time.sleep(1)
         threshold = 1
         max = len(link_paths)
-
-        res_all = []
-        texts = []
 
         self.soups_orig = []
 
@@ -157,29 +142,15 @@ class Scraper:
             #if title != "Also sprach Zarathustra III":
             #    continue
 
-            #print("Looking for '{}' in: {}".format(title, l))
-
             driver.get(l)
             driver.refresh()
             soup = BeautifulSoup(driver.page_source, 'lxml')
 
             self.soups_orig.append(soup)
-
-            #res = self.grab_text(driver, l)
-            #txt = ScrapedText(title, res)
-            #res_all.append(res)
-            #texts.append(txt)
-            #self.__save_to_file(txt)
             self.__save_orig_to_file(title, str(soup))
-            #print("\nWaiting 1 second...\n")
             time.sleep(.6)
 
         driver.close()
-
-        #print("\n\ngot {} texts:".format(len(texts)))
-        #for t in texts:
-        #    print(t.get_title())
-        #    print("##################")
 
         return
 
@@ -251,37 +222,17 @@ class Scraper:
     def __save_to_file(self, text):
         path = "data/output/" + text.get_title() + ".txt"
 
-        #if not os.path.isfile(path):
-        #    with open(path, "x") as f:
-        #        print("Created File: {}".format(f))
-
         with open(path, "w+", encoding='utf-8') as f:
             f.write("$" + text.get_title())
             f.write("\n")
-            #c = text.get_content()
-            #for l in c:
-            #    f.write(str(l) + "\n")
             f.write(text.get_content_string())
 
         return
 
-
     def __save_orig_to_file(self, title, str):
         path = "data/tmp/orig/" + title + ".html"
 
-        #print("saving original data of {} to temporary file: {}".format(title, path))
-
-        #if not os.path.isfile(path):
-        #    with open(path, "x") as f:
-        #        print("Created File: {}".format(f))
-
         with open(path, "w+", encoding='utf-8') as f:
-            #f.write("$" + text.get_title())
-            #f.write("\n")
-            #c = text.get_content()
-            #for l in c:
-            #    f.write(str(l) + "\n")
-            #f.write(text.get_content_string())
             f.write(str)
 
         return
