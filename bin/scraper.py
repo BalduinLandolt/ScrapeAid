@@ -4,10 +4,6 @@ from selenium import webdriver
 import os
 import sys
 
-# TODO check dithyramben
-
-# TODO FF in jenseits von gut und böse (und anderen späteren?), sonst nicht... einheitlich!
-
 
 class Scraper:
     """
@@ -154,6 +150,7 @@ class Scraper:
 
         return
 
+    # TODO unused
     def grab_text(self, driver, url):
         print("grabbing...")
         driver.get(url)
@@ -171,12 +168,6 @@ class Scraper:
                     for h in sub_soup.find_all('h2'):
                         res_list.append(h)
                     for h in sub_soup.find_all('h3'):
-                        res_list.append(h)
-                    for h in sub_soup.find_all('h4'):
-                        res_list.append(h)
-                    for h in sub_soup.find_all('h5'):
-                        res_list.append(h)
-                    for h in sub_soup.find_all('h6'):
                         res_list.append(h)
                     for p in sub_soup.find_all('p'):
                         if p.has_attr('class') and len(p.attrs['class']) > 0 and p.attrs['class'][0] == "Untertitel":
@@ -218,16 +209,6 @@ class Scraper:
         res = url_prefix + parts[0]
 
         return res
-
-    def __save_to_file(self, text):
-        path = "data/output/" + text.get_title() + ".txt"
-
-        with open(path, "w+", encoding='utf-8') as f:
-            f.write("$" + text.get_title())
-            f.write("\n")
-            f.write(text.get_content_string())
-
-        return
 
     def __save_orig_to_file(self, title, str):
         path = "data/tmp/orig/" + title + ".html"
