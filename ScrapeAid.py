@@ -15,16 +15,30 @@ def main():
     scraper = sc.Scraper()
     print("Got Scraper: {}".format(scraper))
 
-    url = ""
-    if len(sys.argv) > 1:
-        #TODO check if actually is a URL, otherwise do other stuff
-        url = sys.argv[1]
-        scraper.download_from_url(url)
-    else:
-        print("No URL handed over. Working from Cache.")
-        # TODO load from cache here
+    if len(sys.argv) < 2:
+        print("No Arguments handed over. Quiting.")
+        quit(-1)
 
-    scraper.scrape_cached_data()
+    arg = sys.argv[1]
+
+    if arg.startswith("www.") or arg.startswith("http"):
+        url = arg
+        scraper.download_from_url(url)
+        scraper.scrape_data_from_orig_to_textblocks()
+        scraper.scrape_data_from_textblock_to_minimalist()
+        print("Done.")
+        quit(0)
+
+    if arg == "from_orig":
+        scraper.scrape_data_from_orig_to_textblocks()
+        scraper.scrape_data_from_textblock_to_minimalist()
+        print("Done.")
+        quit(0)
+
+    if arg == "from_textblock":
+        scraper.scrape_data_from_textblock_to_minimalist()
+        print("Done.")
+        quit(0)
 
     return
 
