@@ -24,11 +24,30 @@ class Scraper:
         Constructor for the 'Scraper' Class.
         """
 
+        self.soups = None
+
         print("Initialized an instance of Scraper")
         return
 
     def scrape_cached_data(self):
+        if self.soups is None:
+            self.__load_cached_origs()
+
+        self.cache_text_blocks(self.soups)
+
         # TODO do stuff here
+        return
+
+
+    def cache_text_blocks(self, list):
+        for text in list:
+            #title = str(list.index(text))
+            title = text.html['filename']
+            html_string = ""
+            for div in text.find_all('div'):
+                if 'class' in div.attrs and len(div.attrs['class']) > 0 and div.attrs['class'][0] == "txt_block":
+                    html_string = html_string + str(div)
+            self.__cache_text_block(title, html_string)
         return
 
 
@@ -99,6 +118,8 @@ class Scraper:
         res_all = []
         texts = []
 
+        self.soups = []
+
         start_time = time.time()
 
         for l in link_paths:
@@ -124,6 +145,8 @@ class Scraper:
             driver.get(l)
             driver.refresh()
             soup = BeautifulSoup(driver.page_source, 'lxml')
+
+            self.soups.append(soup)
 
             #res = self.grab_text(driver, l)
             #txt = ScrapedText(title, res)
@@ -244,5 +267,34 @@ class Scraper:
             #    f.write(str(l) + "\n")
             #f.write(text.get_content_string())
             f.write(str)
+
+        return
+
+    def __cache_text_block(self, title, html_string):
+        path = "data/tmp/textblocks/" + title + ".html"
+        soup = BeautifulSoup(html_string, 'lxml')
+
+        with open(path, "w+", encoding='utf-8') as f:
+            f.write(str(soup))
+
+        print("Cached Textblock for: {}".format(path))
+
+        return
+
+    def __load_cached_origs(self):
+        if self.soups is None:
+            self.soups = []
+
+        files = os.listdir("data/tmp/orig")
+
+        for file in files:
+            path = "data/tmp/orig/" + file
+            if os.path.isfile(path):
+                with open(path, "r+", encoding='utf-8') as f:
+                    file_str = f.read()
+                    s = BeautifulSoup(file_str, 'lxml')
+                    s.html['filename'] = file.split('.')[0]
+                    self.soups.append(s)
+            print("Read {} of {} Files from Cache".format(files.index(file) + 1, len(files)))
 
         return
