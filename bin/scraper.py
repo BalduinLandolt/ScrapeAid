@@ -8,6 +8,7 @@ import re
 import pandas as pd
 import os
 from text import ScrapedText
+import sys
 
 # TODO check dithyramben
 
@@ -57,7 +58,7 @@ class Scraper:
 
         driver = webdriver.Firefox()
         driver.implicitly_wait(30)
-        driver.set_window_rect(600, 10, 1000, 800)
+        driver.set_window_rect(500, 140, 900, 600)
 
         print("Browser open.\nDoing stuff now...")
 
@@ -89,25 +90,36 @@ class Scraper:
         for t in link_paths:
             print(t)
 
+        print("\nloading...\n")
+
         time.sleep(1)
-        max = 1
+        threshold = 1
+        max = len(link_paths)
 
         res_all = []
         texts = []
 
+        start_time = time.time()
+
         for l in link_paths:
             i = link_paths.index(l)
             title = link_texts[i]
+            prog = i / max
+            t_delta = time.time() - start_time
+            t_average = t_delta / (i + 1)
+
+            sys.stdout.write("\r{} of {} ({} %)  ---  Running {} s so far... (ca. {} s remaining)".format(i, max, (100 * prog), round(t_delta, 2), round(t_average * (max - i), 2)))
+            sys.stdout.flush()
 
             # for testing purposes
-            #if i >= max:
+            #if i >= threshold:
             #    break
 
             #for testing purpose
             #if title != "Also sprach Zarathustra III":
             #    continue
 
-            print("Looking for '{}' in: {}".format(title, l))
+            #print("Looking for '{}' in: {}".format(title, l))
 
             driver.get(l)
             driver.refresh()
@@ -119,15 +131,15 @@ class Scraper:
             #texts.append(txt)
             #self.__save_to_file(txt)
             self.__save_orig_to_file(title, str(soup))
-            print("\nWaiting 1 second...\n")
-            time.sleep(1)
+            #print("\nWaiting 1 second...\n")
+            time.sleep(.6)
 
         driver.close()
 
-        print("got {} texts:".format(len(texts)))
-        for t in texts:
-            print(t.get_title())
-            print("##################")
+        #print("\n\ngot {} texts:".format(len(texts)))
+        #for t in texts:
+        #    print(t.get_title())
+        #    print("##################")
 
         # TODO check for exit code
         return 0
@@ -218,7 +230,7 @@ class Scraper:
     def __save_orig_to_file(self, title, str):
         path = "data/tmp/orig/" + title + ".html"
 
-        print("saving original data of {} to temporary file: {}".format(title, path))
+        #print("saving original data of {} to temporary file: {}".format(title, path))
 
         #if not os.path.isfile(path):
         #    with open(path, "x") as f:
