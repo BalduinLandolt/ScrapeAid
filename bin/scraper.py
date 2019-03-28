@@ -17,6 +17,7 @@ class Scraper:
 
         self.soups_orig = None
         self.soups_textblock = None
+        self.soups_minimalist = None
 
         print("Initialized an instance of Scraper")
         return
@@ -31,12 +32,61 @@ class Scraper:
     def strip_textblock_to_minimalist(self, l):
         for text in l:
             title = text.html['filename']
-            html_string = ""
-            #TODO adjust
-            #for div in text.find_all('div'):
-            #    if 'class' in div.attrs and len(div.attrs['class']) > 0 and div.attrs['class'][0] == "txt_block":
-            #        html_string = html_string + str(div)
-            #self.__cache_text_block(title, html_string)
+
+            for p in text.find_all('p'):
+                if p.has_attr('class') and len(p.attrs['class']) > 0 and p.attrs['class'][0] == "Untertitel":
+                    wrapper = text.new_tag("relevant")
+                    p.wrap(wrapper)
+
+            for p in text.find_all('div'):
+                if p.has_attr('class') and len(p.attrs['class']) > 0 and p.attrs['class'][0] == "p":
+                    wrapper = text.new_tag("relevant")
+                    p.wrap(wrapper)
+
+            for p in text.find_all('h1'):
+                wrapper = text.new_tag("relevant")
+                p.wrap(wrapper)
+
+            for p in text.find_all('h2'):
+                wrapper = text.new_tag("relevant")
+                p.wrap(wrapper)
+
+            for p in text.find_all('h3'):
+                wrapper = text.new_tag("relevant")
+                p.wrap(wrapper)
+
+            for p in text.find_all('l'):
+                wrapper = text.new_tag("relevant")
+                p.wrap(wrapper)
+
+            #for br in text.find_all('br'):
+            #    br.replace_with("\\n")
+
+            relevants = []
+            for r in text.find_all('relevant'):
+                relevants.append(r)
+
+            new_soup = BeautifulSoup("<html><body></body></html>", 'lxml')
+            b = new_soup.html.body
+
+            for r in relevants:
+                for s in r.find_all('h1'):
+                    b.append(s)
+                for s in r.find_all('h2'):
+                    b.append(s)
+                for s in r.find_all('h3'):
+                    b.append(s)
+                for s in r.find_all('l'):
+                    b.append(s)
+                for s in r.find_all('p'):
+                    b.append(s)
+
+            # TODO: get <br/> handled
+            # TODO: strip some more
+            # TODO: handle emmendations
+
+            self.__cache_minimalist(title, new_soup)
+
         return
 
     def scrape_data_from_orig_to_textblocks(self):
@@ -44,8 +94,6 @@ class Scraper:
             self.__load_cached_origs()
 
         self.cache_text_blocks(self.soups_orig)
-
-        # TODO do stuff here
         return
 
     def cache_text_blocks(self, l):
@@ -150,39 +198,6 @@ class Scraper:
 
         return
 
-    # TODO unused
-    def grab_text(self, driver, url):
-        print("grabbing...")
-        driver.get(url)
-        driver.refresh()
-
-        res_list = []
-
-        soup = BeautifulSoup(driver.page_source, 'lxml')
-        for div in soup.find_all('div'):
-            if 'class' in div.attrs:
-                if len(div.attrs['class']) > 0 and div.attrs['class'][0] == "txt_block":
-                    sub_soup = BeautifulSoup(str(div), 'lxml')
-                    for h in sub_soup.find_all('h1'):
-                        res_list.append(h)
-                    for h in sub_soup.find_all('h2'):
-                        res_list.append(h)
-                    for h in sub_soup.find_all('h3'):
-                        res_list.append(h)
-                    for p in sub_soup.find_all('p'):
-                        if p.has_attr('class') and len(p.attrs['class']) > 0 and p.attrs['class'][0] == "Untertitel":
-                            wrapper = sub_soup.new_tag("div")
-                            wrapper['class'] = 'p'
-                            p.wrap(wrapper)
-                    for sub_div in sub_soup.find_all('div'):
-                        if len(sub_div.attrs['class']) > 0 and (sub_div.attrs['class'][0] == "p" or sub_div.attrs['class'][0] == "l"):
-                            res_list.append(sub_div)
-
-        print("scraped {}".format(url))
-        print("got {} elements that might be containing text".format(len(res_list)))
-
-        return res_list
-
     def __get_link_text(self, tag):
         res = ""
 
@@ -225,11 +240,28 @@ class Scraper:
         path = "data/tmp/textblocks/" + title + ".html"
         soup = BeautifulSoup(html_string, 'lxml')
         self.soups_textblock.append(soup)
+        soup.html['filename'] = title
 
         with open(path, "w+", encoding='utf-8') as f:
             f.write(str(soup))
 
         print("Cached Textblock for: {}".format(path))
+
+        return
+
+    def __cache_minimalist(self, title, soup):
+        if self.soups_minimalist is None:
+            self.soups_minimalist = []
+
+        path = "data/tmp/minimalist/" + title + ".html"
+
+        soup.html['filename'] = title
+        self.soups_minimalist.append(soup)
+
+        with open(path, "w+", encoding='utf-8') as f:
+            f.write(soup.prettify())
+
+        print("Cached: {}".format(title))
 
         return
 
@@ -263,7 +295,8 @@ class Scraper:
                 with open(path, "r+", encoding='utf-8') as f:
                     file_str = f.read()
                     s = BeautifulSoup(file_str, 'lxml')
-                    s.html['filename'] = file.split('.')[0]
+                    if not s.html.has_attr('filename'):
+                        s.html['filename'] = file.split('.')[0]
                     self.soups_textblock.append(s)
             print("Read {} of {} Files from Cache".format(files.index(file) + 1, len(files)))
 
