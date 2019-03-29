@@ -1,5 +1,6 @@
 import time
 from bs4 import BeautifulSoup
+from bs4.element import NavigableString
 from selenium import webdriver
 import os
 import sys
@@ -60,7 +61,8 @@ class Scraper:
                 p.wrap(wrapper)
 
             for br in text.find_all('br'):
-                br.replace_with("\\n")
+                wrapper = text.new_tag("relevant")
+                p.wrap(wrapper)
 
             emendations = []
 
@@ -68,7 +70,7 @@ class Scraper:
                 if p.has_attr('class') and len(p.attrs['class']) > 0 and p.attrs['class'][0] == "tooltip":
                     emendations.append(p)
 
-            print("Removing{} emendations in: {}".format(len(emendations), title))
+            print("Removing {} emendations in: {}".format(len(emendations), title))
             for e in emendations:
                 e.decompose()
 
@@ -106,7 +108,18 @@ class Scraper:
                     s.string = t
                     b.append(s)
 
-            # TODO: get <br/> handled
+            for t in new_soup.descendants:
+                if type(t) is NavigableString:
+                    st = str(t)
+                    if "\n" in st:
+                        strings = st.split("\n")
+                        parent = t.parent
+                        parent.clear()
+                        parent.append(NavigableString(strings.pop(0)))
+                        for s in strings:
+                            parent.append(new_soup.new_tag("br"))
+                            parent.append(NavigableString(s))
+
             # TODO: strip some more
 
             self.__cache_minimalist(title, new_soup)
