@@ -59,8 +59,8 @@ class Scraper:
                 wrapper = text.new_tag("relevant")
                 p.wrap(wrapper)
 
-            #for br in text.find_all('br'):
-            #    br.replace_with("\\n")
+            for br in text.find_all('br'):
+                br.replace_with("\\n")
 
             relevants = []
             for r in text.find_all('relevant'):
@@ -71,14 +71,29 @@ class Scraper:
 
             for r in relevants:
                 for s in r.find_all('h1'):
+                    t = s.get_text()
+                    s.clear()
+                    s.string = t
                     b.append(s)
                 for s in r.find_all('h2'):
+                    t = s.get_text()
+                    s.clear()
+                    s.string = t
                     b.append(s)
                 for s in r.find_all('h3'):
+                    t = s.get_text()
+                    s.clear()
+                    s.string = t
                     b.append(s)
                 for s in r.find_all('l'):
+                    t = s.get_text()
+                    s.clear()
+                    s.string = t
                     b.append(s)
                 for s in r.find_all('p'):
+                    t = s.get_text()
+                    s.clear()
+                    s.string = t
                     b.append(s)
 
             # TODO: get <br/> handled
@@ -189,6 +204,8 @@ class Scraper:
             driver.get(l)
             driver.refresh()
             soup = BeautifulSoup(driver.page_source, 'lxml')
+
+            soup.html['filename'] = title
 
             self.soups_orig.append(soup)
             self.__save_orig_to_file(title, str(soup))
