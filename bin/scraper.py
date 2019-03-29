@@ -62,6 +62,16 @@ class Scraper:
             for br in text.find_all('br'):
                 br.replace_with("\\n")
 
+            emendations = []
+
+            for p in text.find_all('div'):
+                if p.has_attr('class') and len(p.attrs['class']) > 0 and p.attrs['class'][0] == "tooltip":
+                    emendations.append(p)
+
+            print("Removing{} emendations in: {}".format(len(emendations), title))
+            for e in emendations:
+                e.decompose()
+
             relevants = []
             for r in text.find_all('relevant'):
                 relevants.append(r)
@@ -98,7 +108,6 @@ class Scraper:
 
             # TODO: get <br/> handled
             # TODO: strip some more
-            # TODO: handle emmendations
 
             self.__cache_minimalist(title, new_soup)
 
@@ -296,7 +305,7 @@ class Scraper:
                     s = BeautifulSoup(file_str, 'lxml')
                     s.html['filename'] = file.split('.')[0]
                     self.soups_orig.append(s)
-            print("Read {} of {} Files from Cache".format(files.index(file) + 1, len(files)))
+            print("Read {} of {} Files from Cache: {}".format(files.index(file) + 1, len(files), path))
 
         return
 
@@ -315,6 +324,6 @@ class Scraper:
                     if not s.html.has_attr('filename'):
                         s.html['filename'] = file.split('.')[0]
                     self.soups_textblock.append(s)
-            print("Read {} of {} Files from Cache".format(files.index(file) + 1, len(files)))
+                print("Read {} of {} Files from Cache: {}".format(files.index(file) + 1, len(files), path))
 
         return
