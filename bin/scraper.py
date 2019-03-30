@@ -30,6 +30,16 @@ class Scraper:
         self.strip_textblock_to_minimalist(self.soups_textblock)
         return
 
+    def scrape_minimalist_to_txt(self):
+        if self.soups_minimalist is None:
+            self.__load_cached_minimalist()
+
+        for text in self.soups_minimalist:
+            print()
+            # TODO something
+
+        return
+
     def strip_textblock_to_minimalist(self, l):
         for text in l:
             title = text.html['filename']
@@ -43,6 +53,13 @@ class Scraper:
                 if p.has_attr('class') and len(p.attrs['class']) > 0 and p.attrs['class'][0] == "p":
                     wrapper = text.new_tag("relevant")
                     p.wrap(wrapper)
+                if p.has_attr('class') and len(p.attrs['class']) > 0 and p.attrs['class'][0] == "l":
+                    wrapper = text.new_tag("relevant")
+                    l_tag = text.new_tag("l")
+                    for c in p.children:
+                        l_tag.append(c)
+                    p.replace_with(l_tag)
+                    l_tag.wrap(wrapper)
 
             for p in text.find_all('h1'):
                 wrapper = text.new_tag("relevant")
@@ -343,8 +360,32 @@ class Scraper:
                     self.soups_textblock.append(s)
 
                     # TODO remove
-                    #if len(self.soups_textblock) > 3:
+                    #if len(self.soups_textblock) > 7:
                     #    return
+
+                print("Read {} of {} Files from Cache: {}".format(files.index(file) + 1, len(files), path))
+
+        return
+
+    def __load_cached_minimalist(self):
+        if self.soups_minimalist is None:
+            self.soups_minimalist = []
+
+        files = os.listdir("data/tmp/minimalist")
+
+        for file in files:
+            path = "data/tmp/minimalist/" + file
+            if os.path.isfile(path):
+                with open(path, "r+", encoding='utf-8') as f:
+                    file_str = f.read()
+                    s = BeautifulSoup(file_str, 'lxml')
+                    if not s.html.has_attr('filename'):
+                        s.html['filename'] = file.split('.')[0]
+                    self.soups_minimalist.append(s)
+
+                    # TODO remove
+                    if len(self.soups_minimalist) > 3:
+                        return
 
                 print("Read {} of {} Files from Cache: {}".format(files.index(file) + 1, len(files), path))
 

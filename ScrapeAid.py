@@ -26,17 +26,25 @@ def main():
         scraper.download_from_url(url)
         scraper.scrape_data_from_orig_to_textblocks()
         scraper.scrape_data_from_textblock_to_minimalist()
+        scraper.scrape_minimalist_to_txt()
         print("Done.")
         quit(0)
 
     if arg == "from_orig":
         scraper.scrape_data_from_orig_to_textblocks()
         scraper.scrape_data_from_textblock_to_minimalist()
+        scraper.scrape_minimalist_to_txt()
         print("Done.")
         quit(0)
 
     if arg == "from_textblock":
         scraper.scrape_data_from_textblock_to_minimalist()
+        scraper.scrape_minimalist_to_txt()
+        print("Done.")
+        quit(0)
+
+    if arg == "from_minimalist":
+        scraper.scrape_minimalist_to_txt()
         print("Done.")
         quit(0)
 
