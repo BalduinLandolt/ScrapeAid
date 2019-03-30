@@ -60,9 +60,11 @@ class Scraper:
                 wrapper = text.new_tag("relevant")
                 p.wrap(wrapper)
 
+            brs = text.find_all('br')
             for br in text.find_all('br'):
+                #br.string = "__linebreak__"
                 wrapper = text.new_tag("relevant")
-                p.wrap(wrapper)
+                br.wrap(wrapper)
 
             emendations = []
 
@@ -107,18 +109,20 @@ class Scraper:
                     s.clear()
                     s.string = t
                     b.append(s)
+                for s in r.find_all('br'):
+                    b.append(s)
 
-            for t in new_soup.descendants:
+            """for t in new_soup.descendants:
                 if type(t) is NavigableString:
                     st = str(t)
-                    if "\n" in st:
-                        strings = st.split("\n")
+                    if "__linebreak__" in st:
+                        strings = st.split("__linebreak__")
                         parent = t.parent
                         parent.clear()
                         parent.append(NavigableString(strings.pop(0)))
                         for s in strings:
                             parent.append(new_soup.new_tag("br"))
-                            parent.append(NavigableString(s))
+                            parent.append(NavigableString(s))"""
 
             # TODO: strip some more
 
@@ -282,7 +286,7 @@ class Scraper:
         soup.html['filename'] = title
 
         with open(path, "w+", encoding='utf-8') as f:
-            f.write(str(soup))
+            f.write(soup.prettify())
 
         print("Cached Textblock for: {}".format(path))
 
@@ -337,6 +341,11 @@ class Scraper:
                     if not s.html.has_attr('filename'):
                         s.html['filename'] = file.split('.')[0]
                     self.soups_textblock.append(s)
+
+                    # TODO remove
+                    #if len(self.soups_textblock) > 3:
+                    #    return
+
                 print("Read {} of {} Files from Cache: {}".format(files.index(file) + 1, len(files), path))
 
         return
