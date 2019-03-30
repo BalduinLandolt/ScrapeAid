@@ -35,10 +35,58 @@ class Scraper:
             self.__load_cached_minimalist()
 
         for text in self.soups_minimalist:
-            print()
-            # TODO something
+            title = text.html['filename']
+            prefix = "$ " + title + "\n\n"
+            strs = [prefix]
+
+            for t in text.html.body.children:
+                if t.name == 'h1':
+                    strs.append("\n\n\f ")
+                    ss = t.stripped_strings
+                    for s in ss:
+                        strs.append(self.__tidy(s))
+                    strs.append("\n")
+                if t.name == 'h2':
+                    strs.append("\n\n\f ")
+                    ss = t.stripped_strings
+                    for s in ss:
+                        strs.append(self.__tidy(s))
+                    strs.append("\n")
+                if t.name == 'h3':
+                    strs.append("\n\n\f ")
+                    ss = t.stripped_strings
+                    for s in ss:
+                        strs.append(self.__tidy(s))
+                    strs.append("\n")
+                if t.name == 'p':
+                    ss = t.stripped_strings
+                    for s in ss:
+                        strs.append(self.__tidy(s))
+                    strs.append("\n")
+                if t.name == 'l':
+                    strs.append("   ")
+                    ss = t.stripped_strings
+                    for s in ss:
+                        strs.append(self.__tidy(s))
+                    strs.append("\n")
+                if t.name == 'br':
+                    strs.append("\n")
+
+            res = ''.join(strs)
+
+            self.__save_to_output(title, res)
 
         return
+
+    def __tidy(self, s):
+        res = s.strip()
+
+        while "\n" in res:
+            res = res.replace("\n", "")
+        while "  " in res:
+            res = res.replace("  ", " ")
+
+        return res
 
     def strip_textblock_to_minimalist(self, l):
         for text in l:
@@ -325,6 +373,17 @@ class Scraper:
 
         return
 
+    def __save_to_output(self, title, st):
+
+        path = "data/output/" + title + ".txt"
+
+        with open(path, "w+", encoding='utf-8') as f:
+            f.write(st)
+
+        print("Saved: {}".format(title))
+
+        return
+
     def __load_cached_origs(self):
         if self.soups_orig is None:
             self.soups_orig = []
@@ -384,8 +443,8 @@ class Scraper:
                     self.soups_minimalist.append(s)
 
                     # TODO remove
-                    if len(self.soups_minimalist) > 3:
-                        return
+                    #if len(self.soups_minimalist) > 3:
+                    #    return
 
                 print("Read {} of {} Files from Cache: {}".format(files.index(file) + 1, len(files), path))
 
